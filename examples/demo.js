@@ -7,7 +7,7 @@ import { visiblePadEnd, visibleSlice } from "@dwbinns/terminal/string";
 import { performance } from 'perf_hooks';
 import { clearLineFromCursor } from "@dwbinns/terminal/cursor";
 
-const { random, round, sin } = Math;
+const { round, sin } = Math;
 
 class Colours {
     constructor(frame) {
