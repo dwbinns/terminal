@@ -8,7 +8,7 @@ import { underline } from "@dwbinns/terminal/format";
 console.log(`${magentaBG("Magenta")} ${underline(`underline ${red("red")}`)}`);
 ```
 
-![Formatting example](docs/format.png)
+![Formatting example](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/format.png)
 
 ## Installation
 
@@ -46,7 +46,7 @@ return a string formatted with a red background
 
 All colours - colour palette varies by terminal type:
 
-![Colours](docs/colours.png)
+![Colours](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/colours.png)
 
 ```javascript
 rgb(red, green, blue)(text)
@@ -127,7 +127,7 @@ for (let horizontal of lines) {
     process.stdout.write("\n");
 }
 ```
-![Box drawing](docs/boxes.png)
+![Box drawing](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/boxes.png)
 
     rounded(up, right, down, left)
 
@@ -186,7 +186,7 @@ console.log(
 );
 ```
 
-![Table](docs/table.png)
+![Table](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/table.png)
 
 
 
