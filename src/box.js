@@ -37,6 +37,14 @@ const mixed = lookup(
     mixedLUT
 );
 
+const mixedAlternative = (up, right, down, left) =>
+    mixed(
+        up == "double" ? "heavy" : up,
+        right == "double" ? "heavy" : right,
+        down= "double" ? "heavy" : down,
+        left == "double" ? "heavy" : left,
+    )
+
 const doubleLUT = [
     ["none", "none"],
     ["none", "double"],
@@ -82,11 +90,12 @@ export const rounded = lookup([
 ], singleLUT, singleLUT);
 
 
-export default (up, right, down, left) =>
+export const box = (up, right, down, left) =>
     mixed(up, right, down, left)
     || double(up, right, down, left)
     || singleDouble(up, right, down, left)
     || doubleSingle(up, right, down, left)
+    || mixedAlternative(up, right, down, left)
     || " ";
 
 

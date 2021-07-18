@@ -44,6 +44,18 @@ export const magenta = colour(true, 5);
 export const cyan = colour(true, 6);
 export const white = colour(true, 7);
 
+export const brightBlack = colour(true, 60);
+export const brightRed = colour(true, 61);
+export const brightGreen = colour(true, 62);
+export const brightYellow = colour(true, 63);
+export const brightBlue = colour(true, 64);
+export const brightMagenta = colour(true, 65);
+export const brightCyan = colour(true, 66);
+export const brightWhite = colour(true, 67);
+
+export const grey = brightBlack;
+
+
 export const rgbBG = rgbAt(false);
 
 export const blackBG = colour(false, 0);
@@ -54,4 +66,13 @@ export const blueBG = colour(false, 4);
 export const magentaBG = colour(false, 5);
 export const cyanBG = colour(false, 6);
 export const whiteBG = colour(false, 7);
+export const brightBlackBG = colour(false, 60);
+export const brightRedBG = colour(false, 61);
+export const brightGreenBG = colour(false, 62);
+export const brightYellowBG = colour(false, 63);
+export const brightBlueBG = colour(false, 64);
+export const brightMagentaBG = colour(false, 65);
+export const brightCyanBG = colour(false, 66);
+export const brightWhiteBG = colour(false, 67);
 
+export const greyBG = brightBlackBG;

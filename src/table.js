@@ -3,7 +3,7 @@ import { underline } from "./format.js";
 
 const { max } = Math;
 
-export default function table(content) {
+export default function table(content, {header = true} = {}) {
     let stringified = content.map(row => row.map(cell => `${cell}`));
     let columnLengths = stringified
         .map((row) => row.map(visibleLength))
@@ -24,6 +24,6 @@ export default function table(content) {
                 .join(" "),
 
         )
-        .map((row, index) => index == 0 ? underline(row) : row)
+        .map((row, index) => header && index == 0 ? underline(row) : row)
         .join("\n");
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import box from "@dwbinns/terminal/box";
-import { normalBG, red, rgb, rgbBG, yellow } from "@dwbinns/terminal/colour";
+import { box } from "@dwbinns/terminal/box";
+import { normalBG, brightRed, rgb, rgbBG, brightYellow } from "@dwbinns/terminal/colour";
 import { underline } from "@dwbinns/terminal/format";
 import { decodeKeys } from "@dwbinns/terminal/keyboard";
 import { visiblePadEnd, visibleSlice } from "@dwbinns/terminal/string";
@@ -88,9 +88,10 @@ class Worm {
     }
 }
 
+const keyStyle = x=> brightRed(underline(x));
 class TextScroller {
     constructor(y) {
-        let text = `${yellow(`Welcome! Press ${red(underline('left'))} or ${red(underline('right'))} to move or ${red(underline('escape'))} to exit`)}`;
+        let text = `${brightYellow(`Welcome! Press ${keyStyle('left')} or ${keyStyle('right')} to move or ${keyStyle('escape')} to exit`)}`;
         this.paddedText = visiblePadEnd(text, frame.width) + text + ' ';
         this.y = y;
     }

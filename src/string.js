@@ -21,12 +21,12 @@ export const visibleSlice = (string, start, end) => {
     return output;
 };
 
-export const visiblePadStart = (string, size) => {
-    return "".padStart(max(0, size - visibleLength(string))) + string;
+export const visiblePadStart = (string, size, fill) => {
+    return "".padStart(max(0, size - visibleLength(string)), fill) + string;
 };
 
-export const visiblePadEnd = (string, size) => {
-    return string + "".padEnd(max(0, size - visibleLength(string)));
+export const visiblePadEnd = (string, size, fill) => {
+    return string + "".padEnd(max(0, size - visibleLength(string)), fill);
 };
 
 

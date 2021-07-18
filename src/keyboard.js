@@ -38,6 +38,7 @@ let keyCodes = new Map([
 
 function explainCharacter(char) {
     if (char == "\x7f") return { keyName: "backspace" };
+    if (char == "\x1b") return { keyName: "escape" };
     if (char == "\b") return { keyName: "backspace", ctrl: true };
     if (char == "\r") return { keyName: "return" };
     if (char == "\t") return { keyName: "tab" };
@@ -46,7 +47,7 @@ function explainCharacter(char) {
 }
 
 export async function* decodeKeys(stream) {
-    stream.setRawMode(true);
+    stream?.setRawMode(true);
     for await (let block of stream) {
         for (let { text, csi, terminal, parameters, escape, content } of decodeEscape(block.toString())) {
             if (text) yield explainCharacter(text);
@@ -65,14 +66,15 @@ export async function* decodeKeys(stream) {
                 else yield { unknown: content };
             }
             else if (escape) {
-                if (content == "") yield { keyName: 'escape', shift: false, alt: false, ctrl: false };
-                else if (content == "[Z") yield { keyName: 'tab', shift: true, alt: false, ctrl: false };
+                if (content == "") yield { keyName: 'escape', alt: false };
+                else if (content == "[Z") yield { keyName: 'tab', shift: true };
                 else if (content.startsWith("O") && keyCharacters.has(content.slice(1))) {
                     let keyName = keyCharacters.get(content.slice(1));
                     yield { keyName, shift: false, alt: false, ctrl: false };
                 }
                 else if (content.length == 1) {
-                    yield { ...explainCharacter(content), alt: true };
+                    let { text, ...explanation } = explainCharacter(content);
+                    yield { ...explanation, alt: true };
                 }
                 else yield { unknown: content };
             }
