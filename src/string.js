@@ -1,6 +1,8 @@
 const { max } = Math;
 
-export const visibleLength = (string) => string.replaceAll(/\x1b[[ -?]*./g, "").length;
+export const visibleText = (string) => string.replaceAll(/\x1b[[ -?]*./g, "");
+
+export const visibleLength = (string) => visibleText(string).length;
 
 export const visibleSlice = (string, start, end) => {
     let inputLength = visibleLength(string);

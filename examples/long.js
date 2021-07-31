@@ -2,16 +2,24 @@
 import { setTimeout } from "timers/promises";
 import content from "@dwbinns/terminal/content";
 
+const { random, round } = Math;
+
 let target = content();
-
 let loggers = [];
+let counters = [];
 
-for (let i = 0; i < 40; i++) {
-    loggers.push(target.overprinter())
-    for (let j = 0; j < loggers.length; j++) {
-        loggers[j](`${j}`.padStart(3), "[" + "".padStart(i - j + 1, "=") + "]");
-        await setTimeout(10);
+await target.interact(
+    async () => {
+        for (let i = 0; i < 100; i++) {
+            loggers.push(target.overprinter())
+            counters.push(0);
+            for (let j = 0; j < loggers.length; j++) {
+                counters[j] += round(random() * 10);
+                loggers[j](`${j}`.padStart(3), "[" + "".padStart(counters[j], "=") + "]");
+            }
+            await setTimeout(10);
+        }
     }
-}
+);
 
-target.close();
+console.log("Goodbye!")

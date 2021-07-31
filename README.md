@@ -114,7 +114,8 @@ where up, right, down and left represent the line styles in the specified direct
 Limitations:
 * "heavy" and "double" cannot be combined
 * "single" and "double" cannot be combined on the same axis
-If the limitations are not met then double will be replaced with heavy.
+
+In these cases "double" will be replaced with "heavy".
 
 examples/box.js
 ```javascript
@@ -188,5 +189,7 @@ console.log(
 
 ![Table](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/table.png)
 
+
+## Content scrolling buffer
 
 

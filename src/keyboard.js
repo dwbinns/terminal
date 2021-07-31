@@ -47,7 +47,7 @@ function explainCharacter(char) {
 }
 
 export async function* decodeKeys(stream) {
-    stream?.setRawMode(true);
+    stream.setRawMode?.(true);
     for await (let block of stream) {
         for (let { text, csi, terminal, parameters, escape, content } of decodeEscape(block.toString())) {
             if (text) yield explainCharacter(text);

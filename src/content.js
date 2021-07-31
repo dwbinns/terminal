@@ -2,9 +2,11 @@
 import { decodeKeys } from "../src/keyboard.js";
 import { format } from "util";
 import { visibleLength, visiblePadEnd, visibleSlice } from "./string.js";
-import { clearLineFromCursor, up } from "./cursor.js";
+import { clearLineFromCursor, clearScreenFromCursor, up } from "./cursor.js";
+import { AsyncQueue } from "../._archive/AsyncQueue.js";
+import { on } from "events";
 
-const { max } = Math;
+const { min, max } = Math;
 
 class Content {
 
@@ -15,10 +17,8 @@ class Content {
     lines = [];
     width = process.stderr.columns;
     height = process.stderr.rows - 1;
-
-    constructor() {
-
-    }
+    closed = false;
+    allowExit = false;
 
     requestRender() {
         this.timeout ||= setTimeout(() => this.render(), 16);
@@ -42,57 +42,86 @@ class Content {
     }
 
     render() {
+        if (this.closed) return;
         this.timeout = null;
         if (this.written > 1) process.stderr.write(up(this.written - 1));
+
+        process.stderr.write("\r");
+
         let printLines = this.follow
             ? this.lines.slice(-this.height)
             : this.lines.slice(this.offsetY, this.offsetY + this.height);
 
 
         printLines.forEach((line, index) =>
-            process.stderr.write((index > 0 ? "\n" : "\r") + clearLineFromCursor + visibleSlice(line, this.offsetX, this.offsetX + this.width))
+            process.stderr.write(clearLineFromCursor + visibleSlice(line, this.offsetX, this.offsetX + this.width) + "\n")
         );
 
-        process.stderr.write("Arrow to scroll, escape to interrupt".slice(0, this.width));
+        process.stderr.write(`Arrow to scroll ${this.allowExit ? "escape to exit" : ""}`.slice(0, this.width));
 
         this.written = printLines.length + 1;
-
-
     }
 
-    async interact() {
-        for await (let { keyName } of decodeKeys(process.stdin)) {
-            if (keyName == "escape") break;
-            if (keyName == "left") {
-                if (this.offsetX > 0) this.offsetX -= 1;
-            }
-            if (keyName == "right") {
-                if (this.offsetX < this.maxWidth - this.width) this.offsetX += 1;
-            }
-            if (keyName == "up") {
-                if (this.follow) {
-                    this.follow = false;
-                    this.offsetY = this.lines.length - this.height - 1;
-                } else this.offsetY -= 1;
-                if (this.offsetY < 0) this.offsetY = 0;
-            }
+    async interact(generate) {
+        this.stop = new AbortController();
 
-            if (keyName == "down") {
-                if (this.offsetY < this.lines.length - this.height) this.offsetY += 1;
-                else this.follow = true;
-            }
-            this.requestRender();
-        }
-        this.close();
-        process.exit(1);
+        await Promise.all([
+            (async () => {
+                if (generate) {
+                    await generate(this.stop.signal);
+                    this.allowExit = true;
+                    this.requestRender();
+                }
+            })(),
+            (async () => {
+                process.stdin.setRawMode(true);
+
+                try {
+                    this.requestRender();
+                    for await (let { keyName } of decodeKeys(on(process.stdin, "data", { signal: this.stop.signal }))) {
+                        if (keyName == "escape" && this.allowExit) this.close();
+                        if (keyName == "left") this.offsetX--;
+                        if (keyName == "home") this.offsetX = 0;
+                        if (keyName == "end") this.offsetX = this.maxWidth - this.width;
+                        if (keyName == "right") this.offsetX++;
+                        if ((keyName == "up" || keyName == "pageup") && this.follow) {
+                            this.follow = false;
+                            this.offsetY = this.lines.length - this.height;
+                        }
+                        if (keyName == "up") this.offsetY--;
+                        if (keyName == "down") this.offsetY++;
+                        if (keyName == "pageup") this.offsetY -= this.height;
+                        if (keyName == "pagedown") this.offsetY += this.height;
+
+                        this.offsetX = max(0, min(this.offsetX, this.maxWidth - this.width));
+                        this.offsetY = max(0, this.offsetY);
+                        if (this.offsetY >= this.lines.length - this.height) this.follow = true;
+
+                        this.requestRender();
+                    }
+                } catch (e) {
+                    if (e.name != "AbortError") throw e;
+                } finally {
+                    process.stdin.pause();
+                    this.close();
+                }
+            })()
+        ]);
+
+
+
     }
 
     close() {
-        process.stdin.destroy();
+        if (this.closed) return;
+        this.timeout && clearTimeout(this.timeout);
+        this.closed = true;
+
+        this.stop.abort();
 
         if (this.written > 1) process.stderr.write(up(this.written - 1));
 
-        process.stderr.write("\r");
+        process.stderr.write("\r" + clearScreenFromCursor);
 
         this.lines.forEach((line, index) =>
             process.stderr.write(visiblePadEnd(visibleSlice(line, this.offsetX, this.offsetX + this.width), this.width) + "\n")
@@ -104,7 +133,5 @@ class Content {
 
 
 export default function () {
-    let content = new Content();
-    content.interact().catch(console.error)
-    return content;
+    return new Content();
 }
