@@ -3,7 +3,7 @@
 export const escape = '\x1b';
 const csiStart = `${escape}[`;
 
-let isTTY = process.stderr.isTTY;
+let isTTY = process.stderr.isTTY || process.env.FORCE_COLOR;
 
 export const csi = (...parameters) =>
     isTTY
@@ -13,8 +13,8 @@ export const csi = (...parameters) =>
 export const sgr = (...parameters) => csi(...parameters, "m");
 
 export const wrap = (start, end) => {
-    let wrapText = (string) =>
-        `${start}${string.replaceAll(end, start)}${end}`;
+    let wrapText = (input) =>
+        `${start}${input.toString().replaceAll(end, start)}${end}`;
     wrapText.toString = () => start;
     return wrapText;
 }

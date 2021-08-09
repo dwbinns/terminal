@@ -2,7 +2,9 @@ import { sgr, wrap } from "./ansi.js";
 
 const { max, min, round } = Math;
 
-let colourDepth = process.stderr.getColorDepth();
+let colourDepth = process.stderr.getColorDepth?.() || Number(process.env.FORCE_COLOR);
+
+
 
 export const normalBG = sgr(49);
 export const normal = sgr(39);
