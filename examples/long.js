@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { setTimeout } from "timers/promises";
-import content from "@dwbinns/terminal/content";
+import Content from "@dwbinns/terminal/content";
 
 const { random, round } = Math;
 
-let target = content();
+let target = new Content();
 let loggers = [];
 let counters = [];
 

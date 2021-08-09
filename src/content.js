@@ -3,12 +3,11 @@ import { decodeKeys } from "../src/keyboard.js";
 import { format } from "util";
 import { visibleLength, visiblePadEnd, visibleSlice } from "./string.js";
 import { clearLineFromCursor, clearScreenFromCursor, up } from "./cursor.js";
-import { AsyncQueue } from "../._archive/AsyncQueue.js";
 import { on } from "events";
 
 const { min, max } = Math;
 
-class Content {
+export default class Content {
 
     offsetX = 0;
     offsetY = 0;
@@ -57,13 +56,14 @@ class Content {
             process.stderr.write(clearLineFromCursor + visibleSlice(line, this.offsetX, this.offsetX + this.width) + "\n")
         );
 
-        process.stderr.write(`Arrow to scroll ${this.allowExit ? "escape to exit" : ""}`.slice(0, this.width));
+        if (this.isInteractive) process.stderr.write(`Arrow to scroll ${this.allowExit ? "escape to exit" : ""}`.slice(0, this.width));
 
         this.written = printLines.length + 1;
     }
 
     async interact(generate) {
         this.stop = new AbortController();
+        this.isInteractive = true;
 
         await Promise.all([
             (async () => {
@@ -132,6 +132,3 @@ class Content {
 
 
 
-export default function () {
-    return new Content();
-}
