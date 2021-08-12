@@ -163,14 +163,12 @@ Get the visible length of a string.
 
 ```javascript
 import table from "@dwbinns/terminal/table";
-table(data, {header: false})
+table(data)
 ```
 
 Format tables in aligned columns, even if cells contain formatting characters.
 
 Data should be an array of rows each of which is an array of cells for that row.
-
-The first row will be considered a header and underlined unless the header: false option is passed.
 
 ```javascript
 import table from "@dwbinns/terminal/table";

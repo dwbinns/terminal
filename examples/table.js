@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 import table from "@dwbinns/terminal/table";
-import { red, green, yellow } from "@dwbinns/terminal/colour";
+import { red, green, yellow, blue } from "@dwbinns/terminal/colour";
 
 console.log(
     table(
         [
-            ["Heading", "Information", ""],
-            ["Row1\nMultiline", red("red") + " wide column"],
+            ["Heading", "Information", "check-that-hypens-are-split"],
+            [`Row1 ${blue("with colour")} that is wrapped`, red("red") + " wide column"],
             ["Colspan 2", , green("green\nlines")],
             [, yellow("yellow")],
-            ["Spanning all columns"],
+            ["Spanning all columns and needing wrapping"],
         ],
-        { border: "single", header: "heavy", padding: 1 }
+        { border: "single", padding: 1, maxWidth: 42 }
     )
 );
 
