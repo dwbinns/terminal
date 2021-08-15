@@ -6,6 +6,14 @@ const lookup = (table, verticalLUT, horizontalLUT) =>
         if (vIndex >= 0 && hIndex >= 0) return table[vIndex][hIndex];
     }
 
+const booleanTransform = (table, defaultValue) =>
+    (up, right, down, left) =>
+        table(
+            up ? defaultValue : "none",
+            right ? defaultValue : "none",
+            down ? defaultValue : "none",
+            left ? defaultValue : "none"
+        );
 
 
 const mixedLUT = [
@@ -37,13 +45,17 @@ const mixed = lookup(
     mixedLUT
 );
 
+export const single = booleanTransform(mixed, "single");
+export const heavy = booleanTransform(mixed, "heavy");
+
 const mixedAlternative = (up, right, down, left) =>
     mixed(
         up == "double" ? "heavy" : up,
         right == "double" ? "heavy" : right,
-        down= "double" ? "heavy" : down,
+        down == "double" ? "heavy" : down,
         left == "double" ? "heavy" : left,
     )
+
 
 const doubleLUT = [
     ["none", "none"],
@@ -60,12 +72,14 @@ const singleLUT = [
 ];
 
 
-const double = lookup([
+const doubleDouble = lookup([
     '  ═ ',
     ' ╔╦╗',
     '║╠╬╣',
     ' ╚╩╝',
 ], doubleLUT, doubleLUT);
+
+export const double = booleanTransform(doubleDouble, "double");
 
 const singleDouble = lookup([
     '  ═ ',
@@ -82,17 +96,17 @@ const doubleSingle = lookup([
 ], doubleLUT, singleLUT);
 
 
-export const rounded = lookup([
+export const rounded = booleanTransform(lookup([
     ' ╶─╴',
     '╷╭┬╮',
     '│├┼┤',
     '╵╰┴╯',
-], singleLUT, singleLUT);
+], singleLUT, singleLUT), 'single');
 
 
 export const box = (up, right, down, left) =>
     mixed(up, right, down, left)
-    || double(up, right, down, left)
+    || doubleDouble(up, right, down, left)
     || singleDouble(up, right, down, left)
     || doubleSingle(up, right, down, left)
     || mixedAlternative(up, right, down, left)
