@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { decodeKeys } from "../src/keyboard.js";
 import { format } from "util";
 import { visibleLength, visiblePadEnd, visibleSlice } from "./string.js";

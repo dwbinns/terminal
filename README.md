@@ -29,19 +29,21 @@ British English spelling is used (note the spelling of colour and grey).
 ## Colours
 
 ```javascript
-import {red, redBG, rgb, rgbBG} from "@dwbinns/terminal/colour";
+import { red, redBG, rgb, rgbBG } from "@dwbinns/terminal/colour";
 ```
 
 Functions to apply colouring to strings.
 
 ```javascript
-red(text)
+red(text);
 ```
+
 returns a string formatted red.
 
 ```javascript
-redBG(text)
+redBG(text);
 ```
+
 return a string formatted with a red background
 
 All colours - colour palette varies by terminal type:
@@ -49,16 +51,18 @@ All colours - colour palette varies by terminal type:
 ![Colours](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/colours.png)
 
 ```javascript
-rgb(red, green, blue)(text)
+rgb(red, green, blue)(text);
 ```
+
 formats a string with the given colour. Red, green and blue should be numbers in the range 0 to 255
+
 ```javascript
-rgbBG(red, green, blue)(text)
+rgbBG(red, green, blue)(text);
 ```
+
 formats a string with a given background colour.
 
 RGB colours will be rendered as 3 bit, 8 bit or 24 bit depending on terminal capabilites.
-
 
 ## Keyboard
 
@@ -68,7 +72,6 @@ import {decodeKeys} from "@dwbinns/terminal/box"
 async function * decodeKeys(stream)
 ```
 
-
 An async generator which takes a stream and yields objects
 describing keyboard events.
 
@@ -77,6 +80,7 @@ A stream which is passed in will be set to raw mode.
 Alternatively any async iterable yielding buffers or strings may be supplied.
 
 Each object may contain fields:
+
 - text
 - keyName
 - shift
@@ -88,8 +92,8 @@ Not all keys are distinguishable, for example [ctrl]+[m] is the same as [return]
 ```javascript
 import { decodeKeys } from "@dwbinns/terminal/keyboard";
 for await (let input of decodeKeys(process.stdin)) {
-    console.log(input);
-    if (input.keyName == "escape") break;
+  console.log(input);
+  if (input.keyName == "escape") break;
 }
 ```
 
@@ -104,30 +108,42 @@ for await (let input of decodeKeys(process.stdin)) {
 ## Box drawing characters
 
 ```javascript
-import {box, rounded} from "@dwbinns/terminal/box"
-box(up, right, down, left)
+import { box, rounded } from "@dwbinns/terminal/box";
+box(up, right, down, left);
 ```
 
 Returns a single box drawing character
 where up, right, down and left represent the line styles in the specified direction and can be "none", "single", "double" or "heavy".
 
 Limitations:
-* "heavy" and "double" cannot be combined
-* "single" and "double" cannot be combined on the same axis
+
+- "heavy" and "double" cannot be combined
+- "single" and "double" cannot be combined on the same axis
 
 In these cases "double" will be replaced with "heavy".
 
 examples/box.js
+
 ```javascript
 import { box } from "@dwbinns/terminal/box";
-let lines = ["heavy", "none", "single", "double", "double", "single", "none", "heavy"];
+let lines = [
+  "heavy",
+  "none",
+  "single",
+  "double",
+  "double",
+  "single",
+  "none",
+  "heavy",
+];
 for (let horizontal of lines) {
-    for (let vertical of lines) {
-        process.stdout.write(box(vertical, horizontal, vertical, horizontal));
-    }
-    process.stdout.write("\n");
+  for (let vertical of lines) {
+    process.stdout.write(box(vertical, horizontal, vertical, horizontal));
+  }
+  process.stdout.write("\n");
 }
 ```
+
 ![Box drawing](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/boxes.png)
 
     rounded(up, right, down, left)
@@ -137,33 +153,38 @@ Returns a single box drawing character with rounded corners where up, right, dow
 ## Format aware string functions
 
 ```javascript
-import { visiblePadEnd, visibleSlice,  visiblePadStart} from "@dwbinns/terminal/string";
+import {
+  visiblePadEnd,
+  visibleSlice,
+  visiblePadStart,
+} from "@dwbinns/terminal/string";
 ```
 
 String functions that are aware of the visible length of the string, not including formatting characters.
 
-
 ```javascript
-visiblePadEnd(string, length, fill)
+visiblePadEnd(string, length, fill);
 ```
+
 Pad a string at the end to the specified visible length with the optional fill character.
 
 ```javascript
-visiblePadEnd(string, length, fill)
+visiblePadEnd(string, length, fill);
 ```
+
 Pad a string at the start to the specified visible length with the optional fill character.
 
-
 ```javascript
-visibleLength(string)
+visibleLength(string);
 ```
+
 Get the visible length of a string.
 
 ## Table formatting
 
 ```javascript
 import table from "@dwbinns/terminal/table";
-table(data)
+table(data);
 ```
 
 Format tables in aligned columns, even if cells contain formatting characters.
@@ -175,19 +196,47 @@ import table from "@dwbinns/terminal/table";
 import { red, green } from "@dwbinns/terminal/colour";
 
 console.log(
-    table(
-        [
-            ["Heading", "Information"],
-            ["Row1", red("red")],
-            ["Row2", green("green")],
-        ]
-    )
+  table([
+    ["Heading", "Information"],
+    ["Row1", red("red")],
+    ["Row2", green("green")],
+  ])
 );
 ```
 
 ![Table](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/table.png)
 
+## Tree formatting
 
-## Content scrolling buffer
+```javascript
+import tree from "@dwbinns/terminal/tree";
+tree({ node, getChildren, getDescription, indent, style });
+```
 
+Format a tree:
+- `node`: top level node
+- `getChildren`: function returning array of children for each node (default: `node => node.children`)
+- `getDescription`: function returning a string as a label for each node (default: `node => node.toString()`)
+- `indent`: number of characters of indent (default: 2)
+- `style`: box drawing characters to use (default: rounded)
 
+```javascript
+import tree from "@dwbinns/terminal/tree";
+import { statSync, readdirSync } from "node:fs";
+import { basename, join } from "node:path";
+
+function getChildren(path) {
+  if (!statSync(path).isDirectory()) return [];
+  return readdirSync(path)
+    .filter((item) => !item.startsWith("."))
+    .map((item) => join(path, item));
+}
+
+function getDescription(path) {
+  return basename(path);
+}
+
+console.log(tree({ node: ".", getChildren, getDescription }));
+```
+
+![Tree](https://raw.githubusercontent.com/dwbinns/terminal/main/docs/tree.png)
