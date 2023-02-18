@@ -1,5 +1,6 @@
 import * as colours from "@dwbinns/terminal/colour";
 import table from "@dwbinns/terminal/table";
+import { wavyUnderline } from "@dwbinns/terminal/format";
 
 let names = ["Black", "Red", "Yellow", "Green", "Cyan", "Blue", "Magenta", "White"];
 
@@ -29,3 +30,5 @@ console.log(
         { header: false }
     )
 );
+
+console.log(wavyUnderline(colours.underlineRGB(255, 64, 0)("red wavy underline")));
