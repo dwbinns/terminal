@@ -12,15 +12,19 @@ export default function tree(
 ) {
     let childPath = [...path, node];
     let children = getChildren(node, path);
+
     return getDescription(node)
         + children
             .map((child, index, list) => {
                 let isLast = index < list.length - 1;
-                //let hasChildren = !!getChildren(child, childPath).length;
-                let joiner = style(true, true, isLast, false).padEnd(indent, style(false, true, false, true)) + " ";
-                let margin = style(isLast, false, isLast, false).padEnd(indent) + " ";
+                let line = style(false, true, false, true);
+                let lineCap = style(false, false, false, true);
+                let joiner = style(true, true, isLast, false)
+                let connection = joiner.padEnd(indent - 1, line) + lineCap;
+                let margin = style(isLast, false, isLast, false).padEnd(indent);
+
                 return "\n"
-                    + joiner
+                    + connection
                     + tree({
                         node: child,
                         getDescription,
