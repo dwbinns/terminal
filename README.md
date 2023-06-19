@@ -43,7 +43,7 @@ console.log(wavyUnderline('wavy underlined text'), 'normal');
 Functions to apply colouring to strings.
 
 ```js
-import { cyan, cyanBG, rgb, rgbBG, underlineRGB } from "@dwbinns/terminal/colour";
+import { cyan, cyanBG, rgb, rgbBG, underlineRGB, hslBG } from "@dwbinns/terminal/colour";
 import { underline } from "@dwbinns/terminal/format";
 
 console.log(cyan('cyan text'), 'normal');
@@ -56,9 +56,14 @@ console.log(rgb(red, green, blue)('orange text'), 'normal');
 
 console.log(rgbBG(red, green, blue)('orange background'), 'normal');
 console.log(underline(underlineRGB(red, green, blue)('orange underline')), 'normal');
+
+console.log([...new Array(60)].map((_, index) => hslBG(index * 6, 1, 0.5)(" ")).join(""));
 ```
 
 formats a string with a given background colour.
+
+RGB colours are specified with R, G and B in the range 0 - 255.
+HSL colours are specified with H in the range 0 - 360, S and L in the range 0 - 1.
 
 RGB colours will be rendered as 3 bit, 8 bit or 24 bit depending on terminal capabilites.
 

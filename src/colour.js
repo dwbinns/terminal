@@ -37,7 +37,14 @@ const rgbAt = (where) => (r, g, b) => {
     return identity;
 }
 
+function hsl2rgb(h, s, l) {
+    let a = s * min(l, 1 - l);
+    let f = (n, k = (n + h / 30) % 12) => l - a * max(min(k - 3, 9 - k, 1), -1);
+    return [f(0) * 256, f(8) * 256, f(4) * 256];
+}
+
 export const rgb = rgbAt(foreground);
+export const hsl = (h, s, l) => rgb(...hsl2rgb(h, s, l));
 
 export const black = colour(foreground, 0);
 export const red = colour(foreground, 1);
@@ -61,6 +68,7 @@ export const grey = brightBlack;
 
 
 export const rgbBG = rgbAt(background);
+export const hslBG = (h, s, l) => rgbBG(...hsl2rgb(h, s, l));
 
 export const blackBG = colour(background, 0);
 export const redBG = colour(background, 1);
