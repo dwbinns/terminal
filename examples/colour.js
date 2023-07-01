@@ -32,3 +32,6 @@ console.log(
 );
 
 console.log(wavyUnderline(colours.underlineRGB(255, 64, 0)("red wavy underline")));
+
+console.log(colours.diagnostics());
+

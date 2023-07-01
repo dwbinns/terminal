@@ -1,6 +1,7 @@
 import { sgr, wrap } from "./ansi.js";
+import * as format from "./format.js";
 
-const { max, min, round } = Math;
+const { max, min, round, trunc } = Math;
 
 let colourDepth = process.stderr.getColorDepth?.() || Number(process.env.FORCE_COLOR);
 
@@ -14,25 +15,69 @@ export const normal = sgr(39);
 const identity = x => x;
 identity.toString = () => '';
 
-function colour(where, code, ...parameters) {
-    if (colourDepth >= 4) return wrap(sgr(where + code, ...parameters), sgr(where + 9));
+export function diagnostics() {
+    let colour = new Array(60).fill().map((_, index) => hsl2rgb(index * 6, 1, 0.5));
+    let spectrum = (convert) => colour.map(([r, g, b]) => convert(r, g, b)("+")).join("");
+    let results = [
+        `Colour depth: ${colourDepth}`,
+        `4 bit foreground : ${spectrum((r, g, b) => colour4(foreground, rgbToColour4(r, g, b)))}`,
+        `8 bit foreground : ${spectrum((r, g, b) => colour8(foreground, rgbToColour8(r, g, b)))}`,
+        `24 bit foreground: ${spectrum((r, g, b) => colour24(foreground, rgbToColour24(r, g, b)))}`,
+        `4 bit background : ${spectrum((r, g, b) => colour4(background, rgbToColour4(r, g, b)))}`,
+        `8 bit background : ${spectrum((r, g, b) => colour8(background, rgbToColour8(r, g, b)))}`,
+        `24 bit background: ${spectrum((r, g, b) => colour24(background, rgbToColour24(r, g, b)))}`,
+        `8 bit underline  : ${format.underline(spectrum((r, g, b) => colour8(underline, rgbToColour8(r, g, b))))}`,
+        `24 bit underline : ${format.underline(spectrum((r, g, b) => colour24(underline, rgbToColour24(r, g, b))))}`,
+        '',
+    ];
+
+    return results.join("\n");
+}
+
+function colour(where, code) {
+    if (colourDepth >= 4) return colour4(where, code);
     else return identity;
 }
 
+function colour4(where, code) {
+    return wrap(sgr(where + code), sgr(where + 9));
+}
+
+function colour8(where, colourIndex) {
+    return wrap(sgr(where + 8, 5, colourIndex), sgr(where + 9));
+}
+
+function colour24(where, [r, g, b]) {
+    return wrap(sgr(where + 8, 2, r, g, b), sgr(where + 9));
+}
+
+function rgbToColour4(r, g, b) {
+    const normalize = (v) => v > 128 ? 1 : 0;
+    const bright = (r + g + b) > 384;
+    return normalize(r) + normalize(g) * 2 + normalize(b) * 4 + (bright ? 60 : 0);
+}
+
+function rgbToColour8(r, g, b) {
+    const normalize = v => min(5, max(0, trunc(v / 51)));
+    return normalize(r) * 36 + normalize(g) * 6 + normalize(b) + 16;
+}
+
+function rgbToColour24(r, g, b) {
+    const normalize = (v) => min(255, max(0, round(v)));
+    return [normalize(r), normalize(g), normalize(b)];
+}
+
+
+
 const rgbAt = (where) => (r, g, b) => {
     if (colourDepth >= 24) {
-        const normalize = (v) => min(255, max(0, round(v)));
-        return colour(where, 8, 2, normalize(r), normalize(g), normalize(b));
+        return colour24(where, rgbToColour24(r, g, b));
     }
     if (colourDepth >= 8) {
-        const normalize = v => min(5, max(0, round(v / 42.5)));
-        let colourIndex = normalize(r) * 36 + normalize(g) * 6 + normalize(b) + 16;
-        return colour(where, 8, 5, colourIndex);
+        return colour8(where, rgbToColour8(r, g, b));
     }
-    if (colourDepth >= 4) {
-        const normalize = (v) => v > 128 ? 1 : 0;
-        let colourIndex = normalize(r) + normalize(g) * 2 + normalize(b) * 4;
-        return colour(where, colourIndex);
+    if (colourDepth >= 4 && where != underline) {
+        return colour4(where, rgbToColour4(r, g, b));
     }
     return identity;
 }
