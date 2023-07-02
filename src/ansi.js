@@ -19,7 +19,7 @@ export const wrap = (start, end) => {
     return wrapText;
 }
 
-export const osc = (...parameters) => `${escape}]${parameters.join(";")}${escape}\\`;
+export const osc = (...parameters) => isTTY ? `${escape}]${parameters.join(";")}${escape}\\` : '';
 
 export function* parseEscape(input) {
     let sequence = '';

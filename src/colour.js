@@ -3,7 +3,9 @@ import * as format from "./format.js";
 
 const { max, min, round, trunc } = Math;
 
-let colourDepth = process.stderr.getColorDepth?.() || Number(process.env.FORCE_COLOR);
+const colourDepths = [1, 4, 8, 24];
+
+let colourDepth = process.stderr.getColorDepth?.() || colourDepths[Number(process.env.FORCE_COLOR)];
 
 const background = 40;
 const foreground = 30;
